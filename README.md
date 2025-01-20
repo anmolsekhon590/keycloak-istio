@@ -67,56 +67,56 @@ kubectl port-forward svc/keycloak -n keycloak 8080:80
 
 Now go to `http://localhost:8080/` and login with credentials defined in `keycloak-values.yaml`. 
 
-![[Pasted image 20250119000149.png]]
+![Pasted image 20250119000149.png](images/Pasted image 20250119000149.png)
 
 ### 3.3 Creating a new Realm
 
 Let's start by creating a new Realm called `istio`
 
-![[Pasted image 20250119000256.png]]
+![Pasted image 20250119000256.png](images/Pasted image 20250119000256.png)
 
 ### 3.4 Creating a new client
 
 Inside this realm we will create a new client called `istio` with `client-credentials` flow so our `oauth2-proxy` pod can connect to it.
-![[Pasted image 20250119113714.png]]
+![Pasted image 20250119113714.png](images/Pasted image 20250119113714.png)
 ### 3.5 Configuring client-credentials flow 
 
 Select the options as specified in the screenshot below:
 
-![[Pasted image 20250119002250.png]]
+![Pasted image 20250119002250.png](images/Pasted image 20250119002250.png)
 
 ### 3.6 Specifying redirect URL
 
 Now, we need to specify the valid redirect URL so keycloak can redirect us back to oauth2-proxy after successful login
 
-![[Pasted image 20250119002700.png]]
+![Pasted image 20250119002700.png](images/Pasted image 20250119002700.png)
 
 ### 3.7 Creating and mapping client scope
 
 Go to client scopes tab and click on `istio-dedicated` scope
-![[Pasted image 20250119114014.png]]
+![Pasted image 20250119114014.png](images/Pasted image 20250119114014.png)
 
 Click "Configure a new mapper" and select `Audience` option.
 
-![[Pasted image 20250119005317.png]]
+![Pasted image 20250119005317.png](images/Pasted image 20250119005317.png)
 
 Set the Name field to `istio` and click save.
 
-![[Pasted image 20250119005512.png]]
+![Pasted image 20250119005512.png](images/Pasted image 20250119005512.png)
 
 Verify mapper under `istio-dedicated` scope
 
-![[Pasted image 20250119114104.png]]
+![Pasted image 20250119114104.png](images/Pasted image 20250119114104.png)
 
 ### 3.8 Creating a new user inside istio Realm
 
 We would need to create a user to test our authentication under the istio realm.
 
-![[Pasted image 20250119010328.png]]
+![Pasted image 20250119010328.png](images/Pasted image 20250119010328.png)
 
 After creating, select the created user `johndoe` and go to credentials tab to set a password.
 
-![[Pasted image 20250119010502.png]]
+![Pasted image 20250119010502.png](images/Pasted image 20250119010502.png)
 
 > Note: we can stop the port forward at this point once we are done with keycloak 
 ## 4. Deploy oauth2-proxy
@@ -162,7 +162,7 @@ helm install oauth2-proxy oauth2-proxy/oauth2-proxy -n keycloak -f values/oauth2
 
 Verify pod by running `kubectl get pods -nkeycloak`
 
-![[Pasted image 20250119011317.png]]
+![Pasted image 20250119011317.png](images/Pasted image 20250119011317.png)
 
 ## 5. Configuring Istio and Ingress Gateway
 
@@ -210,7 +210,7 @@ spec:
 
 and apply using `kubectl apply -f crds/request-authentication.yaml`
 
-![[Pasted image 20250119012522.png]]
+![Pasted image 20250119012522.png](images/Pasted image 20250119012522.png)
 
 ### 5.2 Configuring Istio Ingress 
 
@@ -299,13 +299,13 @@ spec:
 
 and apply using `kubectl apply -f crds/ingress-gateway.yaml`
 
-![[Pasted image 20250119013618.png]]
+![Pasted image 20250119013618.png](images/Pasted image 20250119013618.png)
 
 ### 5.3 Verifying Ingress Gateway
 
 Now that we have our ingress gateway deployed. You'll notice it creates a new service of `LoadBalancer` type under `istio-system` namespace.
 
-![[Pasted image 20250119013934.png]]
+![Pasted image 20250119013934.png](images/Pasted image 20250119013934.png)
 As, you can see EXTERNAL-IP is under pending state. Since we are working in a local minikube, we will utilize the metalLB minikube addon to assign an external IP to our ingress gateway's LoadBalancer.
 
 ### 5.4 Installing MetalLB
@@ -337,11 +337,11 @@ data:
 
 apply using `kubectl apply -f configmaps/metallb-configmap.yaml`
 
-![[Pasted image 20250119014806.png]]
+![Pasted image 20250119014806.png](images/Pasted image 20250119014806.png)
 
 and verify using ` kubectl get svc -nistio-system`:
 
-![[Pasted image 20250119014923.png]]
+![Pasted image 20250119014923.png](images/Pasted image 20250119014923.png)
 Voila! An external IP has been assigned.
 
 > Note: Sometimes MetalLB address pools are flushed after system restarts. We can re-apply the metalLB configmap to fix this. 
@@ -410,10 +410,10 @@ spec:
 
 We are done! Let's test the flow by going to `http://nginx.web.svc.cluster.local/` 
 
-![[Pasted image 20250119123652.png]]
+![Pasted image 20250119123652.png](images/Pasted image 20250119123652.png)
 
 Nice! we got redirected to the oauth proxy login page. Lets try logging in with the `johndoe` user we created.
 
-![[Pasted image 20250119123752.png]]
+![Pasted image 20250119123752.png](images/Pasted image 20250119123752.png)
 
-![[Pasted image 20250119123904.png]]
+![Pasted image 20250119123904.png](images/Pasted image 20250119123904.png)
