@@ -1,0 +1,23 @@
+configuration:
+  whiteList: ".svc.cluster.local"
+
+# must be reviewed on production environments
+# please declare k8s secrets for all secrets  
+extraArgs:
+  - --client-id=istio
+  - --client-secret=YNND6Fp5PImLqStCk7kJwxPtLB8TvmYT
+  - --upstream=http://httpbin.httpbin.svc.cluster.local
+  - --provider=oidc
+  - --oidc-issuer-url=http://keycloak.keycloak.svc.cluster.local/realms/istio
+  - --redirect-url=http://oauth2-proxy.keycloak.svc.cluster.local/oauth2/callback
+  - --cookie-secret=aDRMRmhsU3pMeHFrQVJSeWFIcmYzMitURXQrS05KUUE=
+  - --cookie-secure=false
+  - --cookie-csrf-per-request=true
+  - --cookie-csrf-expire=5m
+  - --cookie-domain=.svc.cluster.local
+  - --reverse-proxy=true
+  - --insecure-oidc-allow-unverified-email=true
+  - --pass-authorization-header=true
+  - --set-authorization-header=true
+  - --oidc-extra-audience=istio
+  - --show-debug-on-error

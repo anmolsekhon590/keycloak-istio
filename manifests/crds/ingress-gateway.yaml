@@ -1,0 +1,78 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: nginx
+  namespace: istio-gateways
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - nginx.web.svc.cluster.local
+    - keycloak.keycloak.svc.cluster.local
+    - oauth2-proxy.keycloak.svc.cluster.local
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: oauth2-proxy
+  namespace: istio-gateways
+spec:
+  gateways:
+    - nginx 
+  hosts:
+  - "nginx.web.svc.cluster.local"
+  http:
+  - match:
+    - uri:
+        prefix: "/" 
+    route:
+    - destination:
+        host: nginx.web.svc.cluster.local
+        port:
+          number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: oauth2-proxy-keycloak
+  namespace: istio-gateways
+spec:
+  gateways:
+    - nginx
+  hosts:
+  - "keycloak.keycloak.svc.cluster.local"
+  http:
+  - match:
+    - uri:
+        prefix: "/" 
+    route:
+    - destination:
+        host: keycloak.keycloak.svc.cluster.local
+        port:
+          number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: oauth2-proxy-proxy
+  namespace: istio-gateways
+spec:
+  gateways:
+    - nginx
+  hosts:
+  - "oauth2-proxy.keycloak.svc.cluster.local"
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    route:
+    - destination:
+        host: oauth2-proxy.keycloak.svc.cluster.local
+        port:
+          number: 80

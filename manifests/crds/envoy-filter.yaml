@@ -1,0 +1,41 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: oauth2-proxy-filter
+  namespace: web
+spec:
+  workloadSelector:
+    labels:
+      app: nginx
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          filterChain:
+            filter:
+              name: "envoy.filters.network.http_connection_manager"
+              subFilter:
+                name: "envoy.filters.http.router"
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.ext_authz
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+            http_service:
+              server_uri:
+                uri: http://oauth2-proxy.keycloak.svc.cluster.local:80
+                cluster: outbound|80||oauth2-proxy.keycloak.svc.cluster.local
+                timeout: 5s
+              authorization_request:
+                allowed_headers:
+                  patterns:
+                    - exact: "cookie"
+                    - exact: "authorization"
+              authorization_response:
+                allowed_upstream_headers:
+                  patterns:
+                    - exact: "set-cookie"
+                    - exact: "authorization"

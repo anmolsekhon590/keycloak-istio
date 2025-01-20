@@ -1,0 +1,33 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: jwt-confirm
+  namespace: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  jwtRules:
+    - issuer: "http://keycloak.keycloak.svc.cluster.local/realms/istio"
+      jwksUri: "http://keycloak.keycloak.svc.cluster.local/realms/istio/protocol/openid-connect/certs"
+      audiences:
+        - "istio"
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: verify-jwt
+  namespace: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            requestPrincipals: ["http://keycloak.keycloak.svc.cluster.local/realms/istio/*"]
+      when:
+        - key: request.auth.claims[aud]
+          values: ["istio"]

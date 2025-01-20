@@ -1,0 +1,10 @@
+auth:
+  adminUser: admin
+  adminPassword: admin
+
+resources:
+  requests:
+    memory: 1Gi
+  limits:
+    memory: 2Gi
+
